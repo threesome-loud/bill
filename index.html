@@ -347,6 +347,53 @@ body { background:var(--black); font-family:'Barlow Condensed',sans-serif; color
 .svgph span { font-family:'Bebas Neue'; font-size:14px; letter-spacing:4px; color:rgba(184,150,46,0.65); }
 .svgph small { font-family:'Barlow Condensed'; font-size:9px; letter-spacing:1.5px; color:rgba(184,150,46,0.35); line-height:1.6; }
 .ps-ghost { font-family:'Bebas Neue'; font-size:clamp(55px,11vw,130px); color:rgba(184,150,46,0.04); letter-spacing:-5px; position:absolute; }
+.racquet-frame {
+  width:min(360px,46vw);
+  aspect-ratio:3/4;
+  position:relative;
+  border:1px solid rgba(184,150,46,0.22);
+  background:radial-gradient(circle at 30% 24%, rgba(212,175,55,0.08), rgba(0,0,0,0.2) 62%), linear-gradient(160deg, rgba(255,255,255,0.02), rgba(184,150,46,0.05));
+  clip-path:polygon(0 12px,12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 20px 55px rgba(0,0,0,0.52), 0 0 35px rgba(212,175,55,0.12), inset 0 0 55px rgba(212,175,55,0.05);
+}
+.racquet-frame::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(110deg, transparent 28%, rgba(255,255,255,0.2) 50%, transparent 72%);
+  transform:translateX(-130%);
+  animation:sheenMove 4.2s ease-in-out infinite;
+}
+.racquet-frame::after {
+  content:'';
+  position:absolute;
+  inset:10px;
+  border:1px solid rgba(184,150,46,0.2);
+  clip-path:inherit;
+  pointer-events:none;
+}
+.racquet-img {
+  width:86%;
+  height:86%;
+  object-fit:contain;
+  filter:drop-shadow(0 14px 30px rgba(0,0,0,0.75)) drop-shadow(0 0 20px rgba(212,175,55,0.36));
+  transform-origin:center;
+  animation:racquetFloat 6s ease-in-out infinite;
+}
+@keyframes racquetFloat {
+  0%,100% { transform:translateY(0) rotate(-1.2deg) scale(1); }
+  50% { transform:translateY(-8px) rotate(1.1deg) scale(1.02); }
+}
+@keyframes sheenMove {
+  0%,30% { transform:translateX(-130%); opacity:0; }
+  42% { opacity:0.7; }
+  55% { transform:translateX(130%); opacity:0; }
+  100% { transform:translateX(130%); opacity:0; }
+}
 .ps-since { font-family:'Bebas Neue'; font-size:9px; letter-spacing:5px; color:rgba(184,150,46,0.3); display:block; margin-top:8px; text-align:center; }
 .dinfo { display:flex; flex-direction:column; justify-content:center; padding:32px 5vw; gap:11px; background:var(--black2); }
 .dinfo.lp { padding-left:13vw; }
@@ -598,8 +645,9 @@ body { background:var(--black); font-family:'Barlow Condensed',sans-serif; color
     <span class="stag">Launched 2019</span>
   </div>
   <div class="dsplit dlv" style="flex:1;min-height:0;">
-    <div class="rp rp1">
-      <div class="svgph as"><span>CLASH SVG</span><small>Paste your &lt;svg&gt; here</small></div>
+  <div class="racquet-frame as">
+        <img class="racquet-img" src="WR074511U-1-Clash-108-V2-RD-BL.png" alt="Wilson Clash tennis racquet">
+      </div>
     </div>
     <div class="dinfo">
       <div class="dnum cr au">01</div>
@@ -635,7 +683,9 @@ body { background:var(--black); font-family:'Barlow Condensed',sans-serif; color
     <div class="rp rp2">
       <div class="ps-ghost">PS</div>
       <div style="z-index:2;text-align:center;">
-        <div class="svgph as"><span>PRO STAFF SVG</span><small>Paste your &lt;svg&gt; here</small></div>
+        <div class="racquet-frame as">
+          <img class="racquet-img" src="WR125711U_0_Pro_Staff_97_v14_Copper_Iridescent.png.cq5dam.web_.1200.1200.jpeg" alt="Wilson Pro Staff tennis racquet">
+        </div>
         <span class="ps-since">SINCE 1983 · 117 GRAND SLAMS</span>
       </div>
     </div>
