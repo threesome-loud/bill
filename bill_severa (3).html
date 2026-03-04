@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bill Severa – Wilson Tennis Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:    #B8962E;
+  --red2:   #D4AF37;
+  --red3:   #E8C96A;
+  --black:  #080807;
+  --black2: #0e0d0b;
+  --white:  #F2EDD7;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-snap-type:y mandatory; }
+body { background:var(--black); font-family:'Barlow Condensed',sans-serif; color:var(--white); overflow-x:hidden; cursor:none; }
+
+/* ══ CURSORS ══ */
+#cur-dot {
+  position:fixed; width:10px; height:10px;
+  background:var(--red2); border-radius:50%;
+  pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 10px 4px rgba(212,175,55,0.95), 0 0 26px 8px rgba(212,175,55,0.45);
+}
+#cur-ring {
+  position:fixed; width:38px; height:38px;
+  border:1.5px solid rgba(212,175,55,0.5); border-radius:50%;
+  pointer-events:none; z-index:9998;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 14px rgba(212,175,55,0.18);
+}
+
+
+
+/* ══ CINEMATIC NAV — auto-hide with hover reveal ══ */
+#nav-hover-zone {
+  position:fixed; bottom:0; left:0; right:0; height:80px;
+  z-index:8099; pointer-events:all;
+}
+#slide-nav {
+  position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(120px);
+  z-index:8100;
+  display:flex; align-items:flex-end; gap:0;
+  background:rgba(4,4,3,0.92);
+  border:1px solid rgba(212,175,55,0.22);
+  backdrop-filter:blur(20px);
+  clip-path:polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% 100%, 0% 100%, 0% 12px);
+  box-shadow:0 0 0 1px rgba(212,175,55,0.06), 0 8px 48px rgba(0,0,0,0.7), 0 0 80px rgba(212,175,55,0.06);
+  transition:transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease;
+  opacity:0;
+  pointer-events:none;
+}
+#slide-nav.nav-visible {
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+  pointer-events:all;
+}
+#slide-nav:hover { box-shadow:0 0 0 1px rgba(212,175,55,0.1), 0 8px 60px rgba(0,0,0,0.8), 0 0 100px rgba(212,175,55,0.1); }
+
+/* animated arrow hint */
+#nav-arrow-hint {
+  position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+  z-index:8098; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  transition:opacity 0.35s ease;
+  opacity:1;
+}
+#nav-arrow-hint.hidden { opacity:0; }
+.nav-arrow-chevron {
+  width:18px; height:10px; position:relative;
+}
+.nav-arrow-chevron::before, .nav-arrow-chevron::after {
+  content:''; position:absolute; top:0;
+  width:10px; height:1.5px; background:rgba(212,175,55,0.5);
+  border-radius:2px;
+}
+.nav-arrow-chevron::before { left:0; transform:rotate(35deg); transform-origin:left center; }
+.nav-arrow-chevron::after  { right:0; transform:rotate(-35deg); transform-origin:right center; }
+.nac1 { animation:arrowBob 1.8s ease-in-out infinite; }
+.nac2 { animation:arrowBob 1.8s ease-in-out infinite 0.2s; opacity:0.5; }
+.nac3 { animation:arrowBob 1.8s ease-in-out infinite 0.4s; opacity:0.2; }
+@keyframes arrowBob {
+  0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)}
+}
+
+/* progress bar runs along top of nav */
+#nav-progress-bar {
+  position:absolute; top:0; left:0; height:2px;
+  background:linear-gradient(to right, rgba(212,175,55,0.3), var(--red2), rgba(212,175,55,0.3));
+  transition:width 0.5s cubic-bezier(0.25,1,0.5,1);
+  width:0%;
+  box-shadow:0 0 12px 2px rgba(212,175,55,0.6);
+}
+
+.sn-item {
+  position:relative; display:flex; flex-direction:column; align-items:center;
+  padding:14px 18px 12px;
+  cursor:pointer; border:none; background:none; color:inherit;
+  transition:background 0.3s;
+  min-width:70px;
+  border-right:1px solid rgba(212,175,55,0.08);
+}
+.sn-item:last-child { border-right:none; }
+.sn-item::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--red2); transform:scaleX(0); transform-origin:center;
+  transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  box-shadow:0 0 18px 4px rgba(212,175,55,0.7);
+}
+.sn-item:hover { background:rgba(212,175,55,0.05); }
+.sn-item:hover::before { transform:scaleX(0.5); }
+.sn-item.active { background:rgba(212,175,55,0.08); }
+.sn-item.active::before { transform:scaleX(1); animation:navScan 2.5s ease-in-out infinite; }
+@keyframes navScan {
+  0%,100%{ box-shadow:0 0 12px 3px rgba(212,175,55,0.5); opacity:1; }
+  50%    { box-shadow:0 0 22px 6px rgba(212,175,55,0.9); opacity:1; }
+}
+
+.sn-num {
+  font-family:'Bebas Neue'; font-size:9px; letter-spacing:3px;
+  color:rgba(212,175,55,0.35); line-height:1; margin-bottom:5px;
+  transition:color 0.3s;
+}
+.sn-item.active .sn-num { color:rgba(212,175,55,0.7); }
+
+.sn-pip-row { display:flex; align-items:center; justify-content:center; margin-bottom:6px; }
+.sn-pip {
+  width:8px; height:8px; border-radius:50%;
+  border:1.5px solid rgba(212,175,55,0.28);
+  background:transparent;
+  transition:all 0.4s cubic-bezier(0.22,1,0.36,1);
+  box-shadow:none;
+  position:relative;
+}
+.sn-item:hover .sn-pip {
+  border-color:var(--red2);
+  background:rgba(212,175,55,0.35);
+  box-shadow:0 0 12px 4px rgba(212,175,55,0.5);
+  transform:scale(1.3);
+}
+.sn-item.active .sn-pip {
+  background:var(--red2);
+  border-color:var(--red3);
+  box-shadow:0 0 0 3px rgba(212,175,55,0.15), 0 0 18px 6px rgba(212,175,55,0.55), 0 0 40px 10px rgba(212,175,55,0.2);
+  transform:scale(1.6);
+  animation:pipPulse 2s ease-in-out infinite;
+}
+@keyframes pipPulse {
+  0%,100%{ box-shadow:0 0 0 3px rgba(212,175,55,0.15), 0 0 18px 6px rgba(212,175,55,0.55), 0 0 40px 10px rgba(212,175,55,0.2); }
+  50%    { box-shadow:0 0 0 6px rgba(212,175,55,0.08), 0 0 28px 8px rgba(212,175,55,0.75), 0 0 60px 14px rgba(212,175,55,0.3); }
+}
+
+.sn-label {
+  font-family:'Bebas Neue'; font-size:10px; letter-spacing:3px;
+  color:rgba(242,237,215,0.28); text-transform:uppercase; white-space:nowrap;
+  transition:color 0.3s;
+}
+.sn-item:hover .sn-label { color:rgba(242,237,215,0.7); }
+.sn-item.active .sn-label { color:var(--red3); }
+
+/* slide count indicator on far right */
+.sn-counter {
+  padding:0 16px 0 12px; display:flex; flex-direction:column; justify-content:center;
+  align-items:center; gap:3px; border-left:1px solid rgba(212,175,55,0.1); min-width:54px;
+}
+.sn-counter-cur {
+  font-family:'Bebas Neue'; font-size:22px; color:var(--red2); line-height:1;
+  transition:color 0.3s;
+}
+.sn-counter-sep { width:20px; height:1px; background:rgba(212,175,55,0.3); }
+.sn-counter-tot {
+  font-family:'Bebas Neue'; font-size:11px; color:rgba(212,175,55,0.35); letter-spacing:1px;
+}
+
+/* ══ VO BUTTON ══ */
+#vo-btn { position:fixed; top:20px; right:24px; z-index:8500; display:flex; align-items:center; gap:10px; background:rgba(6,6,6,0.93); border:1px solid rgba(184,150,46,0.4); color:var(--red3); font-family:'Bebas Neue'; font-size:12px; letter-spacing:3px; padding:9px 18px 8px; cursor:pointer; backdrop-filter:blur(12px); transition:all 0.25s; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px)); }
+#vo-btn:hover { background:rgba(184,150,46,0.14); border-color:var(--red2); box-shadow:0 0 20px rgba(212,175,55,0.2); }
+.vo-btn-dot { width:8px; height:8px; background:var(--red2); border-radius:50%; box-shadow:0 0 8px rgba(212,175,55,0.9); flex-shrink:0; }
+#vo-btn.playing .vo-btn-dot { animation:voPulse 1s ease-in-out infinite; }
+@keyframes voPulse { 0%,100%{box-shadow:0 0 8px rgba(212,175,55,0.9);transform:scale(1)} 50%{box-shadow:0 0 18px rgba(212,175,55,1);transform:scale(1.4)} }
+
+/* ══ VO MODAL ══ */
+#vo-modal { position:fixed; inset:0; z-index:9100; display:flex; align-items:flex-start; justify-content:flex-end; padding:70px 24px 0; pointer-events:none; opacity:0; transition:opacity 0.3s; }
+#vo-modal.open { opacity:1; pointer-events:all; }
+#vo-back { position:absolute; inset:0; background:rgba(0,0,0,0); backdrop-filter:blur(0); transition:all 0.3s; }
+#vo-modal.open #vo-back { background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); }
+#vo-panel { position:relative; z-index:2; background:rgba(6,6,6,0.98); border:1px solid rgba(184,150,46,0.3); width:410px; max-height:76vh; display:flex; flex-direction:column; clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px)); transform:translateY(-16px); transition:transform 0.35s cubic-bezier(0.22,1,0.36,1); box-shadow:0 24px 80px rgba(0,0,0,0.85); }
+#vo-modal.open #vo-panel { transform:translateY(0); }
+.vo-head { padding:18px 20px 14px; border-bottom:1px solid rgba(184,150,46,0.14); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.vo-title { font-family:'Bebas Neue'; font-size:13px; letter-spacing:4px; color:var(--red3); }
+.vo-sid { font-family:'Barlow Condensed'; font-size:10px; letter-spacing:3px; color:rgba(184,150,46,0.45); text-transform:uppercase; margin-top:3px; }
+#vo-x { background:none; border:1px solid rgba(184,150,46,0.25); color:rgba(184,150,46,0.7); width:26px; height:26px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; transition:all 0.2s; }
+#vo-x:hover { background:rgba(184,150,46,0.15); color:var(--red2); }
+.vo-prog { height:2px; background:rgba(184,150,46,0.12); margin:0 20px 12px; flex-shrink:0; }
+.vo-prog-fill { height:100%; background:linear-gradient(to right,var(--red),var(--red2)); transition:width 0.4s; }
+.vo-body { padding:18px 20px; overflow-y:auto; flex:1; scrollbar-width:thin; scrollbar-color:rgba(184,150,46,0.2) transparent; }
+.vo-text { font-family:'Barlow'; font-weight:300; font-size:13px; line-height:1.85; color:rgba(255,255,255,0.9); border-left:2px solid rgba(184,150,46,0.45); padding-left:14px; }
+.vo-foot { padding:12px 20px 14px; border-top:1px solid rgba(184,150,46,0.1); display:flex; gap:8px; flex-shrink:0; }
+.vo-nbtn { flex:1; background:rgba(184,150,46,0.07); border:1px solid rgba(184,150,46,0.22); color:var(--red3); font-family:'Bebas Neue'; font-size:11px; letter-spacing:3px; padding:8px; cursor:pointer; transition:all 0.2s; clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px)); }
+.vo-nbtn:hover { background:rgba(184,150,46,0.18); border-color:var(--red2); }
+
+/* ══ SOURCE OVERLAY ══ */
+#src-ov { position:fixed; inset:0; z-index:9200; opacity:0; pointer-events:none; transition:opacity 0.3s; display:flex; }
+#src-ov.open { opacity:1; pointer-events:all; }
+#src-bk { position:absolute; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); cursor:pointer; }
+#src-panel { position:relative; z-index:2; display:flex; width:100%; height:100%; transform:translateY(18px); transition:transform 0.35s cubic-bezier(0.22,1,0.36,1); }
+#src-ov.open #src-panel { transform:translateY(0); }
+#src-left { flex:1; display:flex; flex-direction:column; background:#090909; border-right:2px solid var(--red); }
+.src-bar { background:rgba(6,6,6,0.99); border-bottom:1px solid rgba(184,150,46,0.2); padding:10px 16px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.src-dots { display:flex; gap:6px; }
+.sd { width:11px; height:11px; border-radius:50%; cursor:pointer; }
+.sd-r{background:#FF5F57}.sd-y{background:#FEBC2E}.sd-g{background:#28C840}
+.src-url { font-family:'Barlow Condensed'; font-size:11px; letter-spacing:1px; color:rgba(255,255,255,0.3); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#src-iframe-area { flex:1; display:flex; flex-direction:column; }
+#src-iframe { flex:1; border:none; width:100%; }
+.src-noprev { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; font-family:'Barlow Condensed'; text-align:center; color:rgba(255,255,255,0.25); }
+.src-noprev .lock { font-size:52px; opacity:0.3; }
+.src-noprev p { font-size:13px; letter-spacing:2px; text-transform:uppercase; }
+.src-noprev small { font-size:11px; color:rgba(255,255,255,0.15); letter-spacing:1px; }
+.np-btn { color:var(--red3)!important; text-decoration:none; border:1px solid rgba(184,150,46,0.35); padding:9px 20px; font-family:'Bebas Neue'; font-size:12px; letter-spacing:3px; transition:all 0.2s; display:inline-block; }
+.np-btn:hover { background:rgba(184,150,46,0.15); border-color:var(--red2); }
+#src-right { width:360px; flex-shrink:0; background:rgba(6,6,6,0.99); display:flex; flex-direction:column; }
+.src-rh { padding:18px 20px 14px; border-bottom:1px solid rgba(184,150,46,0.12); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.src-rh-title { font-family:'Bebas Neue'; font-size:12px; letter-spacing:4px; color:var(--red3); }
+#src-close { background:none; border:1px solid rgba(184,150,46,0.25); color:rgba(184,150,46,0.7); width:26px; height:26px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; transition:all 0.2s; }
+#src-close:hover { background:rgba(184,150,46,0.15); color:var(--red2); }
+.src-rbody { padding:20px; overflow-y:auto; flex:1; scrollbar-width:thin; scrollbar-color:rgba(184,150,46,0.2) transparent; display:flex; flex-direction:column; gap:14px; }
+.src-fl-lbl { font-family:'Bebas Neue'; font-size:10px; letter-spacing:4px; color:rgba(184,150,46,0.5); display:block; margin-bottom:4px; }
+.src-fl-val { font-family:'Barlow'; font-weight:300; font-size:13px; color:rgba(255,255,255,0.82); line-height:1.6; }
+.src-div { height:1px; background:rgba(184,150,46,0.08); }
+.src-obtn { margin:0 20px 20px; padding:11px; background:rgba(184,150,46,0.08); border:1px solid rgba(184,150,46,0.3); color:var(--red3); font-family:'Bebas Neue'; font-size:12px; letter-spacing:3px; cursor:pointer; text-decoration:none; display:block; text-align:center; transition:all 0.2s; flex-shrink:0; }
+.src-obtn:hover { background:rgba(184,150,46,0.18); border-color:var(--red2); }
+
+/* ══ SLIDES — snap one per screen ══ */
+.slide { height:100vh; min-height:100vh; max-height:100vh; width:100%; position:relative; overflow:hidden; display:flex; flex-direction:column; scroll-snap-align:start; scroll-snap-stop:always; }
+
+/* ══ LOOP ANIMATIONS ══ */
+@keyframes fadeUp {
+  0%{opacity:0;transform:translateY(32px)} 100%{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeIn {
+  0%{opacity:0} 100%{opacity:1}
+}
+@keyframes slideL {
+  0%{opacity:0;transform:translateX(-38px)} 100%{opacity:1;transform:translateX(0)}
+}
+@keyframes slideR {
+  0%{opacity:0;transform:translateX(38px)} 100%{opacity:1;transform:translateX(0)}
+}
+@keyframes scaleIn {
+  0%{opacity:0;transform:scale(0.84)} 100%{opacity:1;transform:scale(1)}
+}
+@keyframes lineW {
+  0%{transform:scaleX(0);opacity:0} 100%{transform:scaleX(1);opacity:1}
+}
+.au  { animation:fadeUp   0.6s ease-out both; }
+.ai  { animation:fadeIn   0.6s ease-out both; }
+.al  { animation:slideL   0.6s ease-out both; }
+.ar  { animation:slideR   0.6s ease-out both; }
+.as  { animation:scaleIn  0.6s ease-out both; }
+.alw { animation:lineW    0.6s ease-out both; transform-origin:left; }
+.d1{animation-delay:0.15s}.d2{animation-delay:0.3s}.d3{animation-delay:0.45s}
+.d4{animation-delay:0.6s}.d5{animation-delay:0.75s}.d6{animation-delay:0.9s}.d7{animation-delay:1.05s}
+
+/* ═══ SLIDE 1 — TITLE ═══ */
+#s1 { background:var(--black); justify-content:center; align-items:flex-start; padding:0 8vw 32px 13vw; }
+.s1-grid { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(184,150,46,0.055) 1px,transparent 1px),linear-gradient(90deg,rgba(184,150,46,0.055) 1px,transparent 1px); background-size:62px 62px; mask-image:radial-gradient(ellipse 85% 85% at 64% 50%,black 10%,transparent 72%); animation:gPulse 7s ease-in-out infinite; }
+@keyframes gPulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+.orb { position:absolute; border-radius:50%; pointer-events:none; filter:blur(80px); }
+.orb-a { width:580px; height:580px; background:radial-gradient(circle,rgba(184,150,46,0.33) 0%,rgba(100,80,10,0.12) 55%,transparent 75%); top:50%; left:60%; transform:translate(-50%,-50%); animation:orbB 7s ease-in-out infinite; }
+.orb-b { width:220px; height:220px; background:radial-gradient(circle,rgba(184,150,46,0.14) 0%,transparent 70%); bottom:15%; right:12%; filter:blur(50px); animation:orbF 10s ease-in-out infinite; }
+@keyframes orbB { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.14)} }
+@keyframes orbF  { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-22px,-16px)} }
+.ring { position:absolute; border-radius:50%; pointer-events:none; border:1px solid rgba(184,150,46,0.2); top:50%; left:63%; }
+.ring::after { content:''; position:absolute; width:7px; height:7px; background:var(--red2); border-radius:50%; top:-3.5px; left:50%; transform:translateX(-50%); box-shadow:0 0 14px 6px rgba(212,175,55,0.78); }
+.r1 { width:340px; height:340px; transform:translate(-50%,-50%); animation:rRot 22s linear infinite; }
+.r2 { width:520px; height:520px; transform:translate(-50%,-50%); animation:rRot 36s linear infinite reverse; border-color:rgba(184,150,46,0.09); }
+.r3 { width:700px; height:700px; transform:translate(-50%,-50%); animation:rRot 55s linear infinite; border-color:rgba(184,150,46,0.04); }
+@keyframes rRot { from{transform:translate(-50%,-50%) rotate(0deg)} to{transform:translate(-50%,-50%) rotate(360deg)} }
+.ghost-w { font-family:'Bebas Neue'; font-size:clamp(200px,34vw,500px); line-height:0.85; color:rgba(184,150,46,0.045); position:absolute; right:-2vw; top:50%; transform:translateY(-50%); letter-spacing:-10px; pointer-events:none; z-index:1; animation:gPulse 9s ease-in-out infinite; }
+.s1-inner { position:relative; z-index:2; }
+.s1-eye { font-family:'Barlow Condensed'; color:var(--red2); font-size:11px; letter-spacing:8px; text-transform:uppercase; display:block; margin-bottom:20px; }
+#s1 h1 { font-family:'Bebas Neue'; font-size:clamp(80px,13vw,158px); line-height:0.87; letter-spacing:3px; }
+#s1 h1 span { color:var(--red2); }
+.s1-ln { width:52px; height:2px; background:linear-gradient(to right,var(--red2),transparent); margin:22px 0; transform-origin:left; }
+.s1-sub { font-family:'Barlow'; font-weight:300; color:rgba(242,237,215,0.82); font-size:clamp(16px,1.8vw,22px); max-width:480px; line-height:1.7; }
+.s1-badge { margin-top:30px; font-family:'Bebas Neue'; font-size:10px; letter-spacing:4px; color:rgba(184,150,46,0.52); border:1px solid rgba(184,150,46,0.22); padding:6px 14px; display:inline-block; }
+
+/* ═══ SLIDE 2 — BIOGRAPHY ═══ */
+#s2 { display:grid; grid-template-columns:1fr 1fr; }
+.s2-l { background:linear-gradient(140deg,#0a0900,#110f00); border-right:2px solid var(--red); display:flex; flex-direction:column; justify-content:center; padding:0 5vw 32px 13vw; position:relative; overflow:hidden; }
+.s2-l::after { content:'DESIGNER'; font-family:'Bebas Neue'; font-size:10vw; color:rgba(184,150,46,0.05); position:absolute; bottom:-8px; left:-5px; line-height:1; letter-spacing:-3px; pointer-events:none; animation:gPulse 9s ease-in-out infinite; }
+.bio-lbl { font-size:10px; letter-spacing:6px; color:rgba(184,150,46,0.65); text-transform:uppercase; margin-bottom:14px; }
+.bio-name { font-family:'Bebas Neue'; font-size:clamp(44px,6vw,82px); color:var(--white); line-height:0.92; }
+.bio-role { font-family:'Barlow Condensed'; font-weight:300; color:var(--red3); font-size:17px; margin-top:10px; letter-spacing:1px; }
+.bio-stats { display:flex; gap:24px; margin-top:30px; }
+.sn { font-family:'Bebas Neue'; font-size:40px; line-height:1; color:var(--red2); display:block; }
+.sl { font-size:9px; letter-spacing:3px; color:rgba(255,255,255,0.42); text-transform:uppercase; }
+.s2-r { display:flex; flex-direction:column; justify-content:center; padding:0 6vw 32px; background:var(--black2); }
+.sec-tag { font-family:'Bebas Neue'; color:rgba(184,150,46,0.2); font-size:10px; letter-spacing:5px; margin-bottom:18px; text-transform:uppercase; }
+.bio-body { font-family:'Barlow'; font-weight:300; color:rgba(255,255,255,0.88); font-size:clamp(14px,1.5vw,18px); line-height:1.8; border-left:2px solid var(--red); padding-left:18px; }
+.bio-pts { margin-top:22px; display:flex; flex-direction:column; gap:12px; }
+.bio-pt { display:flex; align-items:flex-start; gap:12px; color:rgba(255,255,255,0.85); font-size:clamp(13px,1.2vw,15px); font-family:'Barlow Condensed'; letter-spacing:0.5px; }
+.bio-dot { width:5px; height:5px; background:var(--red2); border-radius:50%; flex-shrink:0; margin-top:6px; }
+
+/* ═══ SLIDE 3 — BREAKTHROUGH ═══ */
+#s3 { background:var(--black); border-top:1px solid rgba(184,150,46,0.18); justify-content:center; padding:0 7vw 32px 13vw; overflow:hidden; }
+#s3::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(-45deg,transparent,transparent 50px,rgba(184,150,46,0.016) 50px,rgba(184,150,46,0.016) 51px); pointer-events:none; }
+.s3-bg { font-family:'Bebas Neue'; font-size:28vw; color:rgba(184,150,46,0.04); position:absolute; right:-4vw; top:50%; transform:translateY(-50%); pointer-events:none; animation:gPulse 9s ease-in-out infinite; }
+.s3-eye { font-size:10px; letter-spacing:7px; color:var(--red2); text-transform:uppercase; margin-bottom:14px; position:relative; z-index:2; display:block; }
+#s3 h2 { font-family:'Bebas Neue'; font-size:clamp(52px,7vw,96px); color:var(--white); line-height:0.9; margin-bottom:8px; position:relative; z-index:2; }
+#s3 h2 span { color:var(--red2); }
+.s3-sub { font-size:11px; letter-spacing:5px; color:rgba(184,150,46,0.48); text-transform:uppercase; margin-bottom:34px; position:relative; z-index:2; display:block; }
+.brk-grid { position:relative; z-index:2; display:grid; grid-template-columns:1.1fr 1fr; gap:48px; align-items:start; max-width:1100px; }
+.brk-quote { font-family:'Bebas Neue'; font-size:clamp(18px,2.2vw,28px); color:var(--white); line-height:1.45; letter-spacing:0.5px; border-left:3px solid var(--red2); padding-left:18px; margin-bottom:22px; }
+.brk-desc { font-family:'Barlow'; font-weight:300; color:rgba(255,255,255,0.8); font-size:clamp(13px,1.3vw,16px); line-height:1.75; margin-bottom:20px; }
+.brk-pills-lbl { font-family:'Bebas Neue'; font-size:10px; letter-spacing:5px; color:var(--red2); margin-bottom:11px; display:block; }
+.brk-pills { display:flex; flex-wrap:wrap; gap:7px; }
+.brk-pill { font-size:10px; letter-spacing:2px; text-transform:uppercase; border:1px solid rgba(184,150,46,0.35); color:rgba(184,150,46,0.9); padding:5px 12px; font-family:'Barlow Condensed'; }
+.bk-stats { display:flex; flex-direction:column; gap:14px; }
+.bk-card { background:rgba(184,150,46,0.05); border:1px solid rgba(184,150,46,0.18); padding:18px 16px; position:relative; overflow:hidden; transition:border-color 0.3s,transform 0.3s; }
+.bk-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--red); }
+.bk-card:hover { border-color:rgba(184,150,46,0.45); transform:translateX(5px); }
+.bk-num { font-family:'Bebas Neue'; font-size:36px; color:var(--red2); line-height:1; display:block; }
+.bk-lbl { font-family:'Barlow Condensed'; font-size:10px; letter-spacing:3px; color:rgba(255,255,255,0.46); text-transform:uppercase; display:block; margin-top:3px; }
+.bk-note { font-family:'Barlow'; font-weight:300; font-size:11px; color:rgba(255,255,255,0.42); margin-top:5px; line-height:1.5; }
+
+/* ═══ SLIDES 4 & 5 — DESIGN EXAMPLES ═══ */
+#s4 { background:var(--black); }
+#s5 { background:var(--black2); }
+.shdr { padding:18px 6vw 16px 13vw; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.shdr.red { background:linear-gradient(to right,#100d00,#070600); border-bottom:2px solid var(--red); }
+.shdr.dark { background:var(--black); border-bottom:1px solid rgba(184,150,46,0.12); }
+.shdr h2 { font-family:'Bebas Neue'; font-size:clamp(20px,3vw,44px); letter-spacing:2px; color:var(--white); }
+.shdr .stag { font-size:11px; letter-spacing:5px; color:rgba(184,150,46,0.62); text-transform:uppercase; }
+.dsplit { flex:1; display:grid; min-height:0; }
+.dlv { grid-template-columns:1.15fr 1fr; }
+.drv { grid-template-columns:1fr 1.15fr; }
+.rp { position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:36px; perspective:900px; }
+.rp1 { background:linear-gradient(140deg,#060605,#0f0d00); }
+.rp2 { background:linear-gradient(140deg,#080806,#0b0900); border-left:1px solid rgba(184,150,46,0.06); }
+.svgph { width:min(220px,32vw); height:min(280px,40vw); border:2px dashed rgba(184,150,46,0.28); border-radius:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(184,150,46,0.03); color:rgba(184,150,46,0.5); text-align:center; padding:18px; }
+.svgph span { font-family:'Bebas Neue'; font-size:14px; letter-spacing:4px; color:rgba(184,150,46,0.65); }
+.svgph small { font-family:'Barlow Condensed'; font-size:9px; letter-spacing:1.5px; color:rgba(184,150,46,0.35); line-height:1.6; }
+.ps-ghost { font-family:'Bebas Neue'; font-size:clamp(55px,11vw,130px); color:rgba(184,150,46,0.04); letter-spacing:-5px; position:absolute; }
+.ps-since { font-family:'Bebas Neue'; font-size:9px; letter-spacing:5px; color:rgba(184,150,46,0.3); display:block; margin-top:8px; text-align:center; }
+.dinfo { display:flex; flex-direction:column; justify-content:center; padding:32px 5vw; gap:11px; background:var(--black2); }
+.dinfo.lp { padding-left:13vw; }
+.dnum { font-family:'Bebas Neue'; font-size:66px; line-height:0.85; letter-spacing:-3px; opacity:0.22; }
+.dnum.cr { color:var(--red2); }
+.dnum.cg { color:rgba(184,150,46,0.12); }
+.dtitle { font-family:'Bebas Neue'; color:var(--white); font-size:clamp(32px,4.5vw,62px); line-height:0.92; letter-spacing:1px; }
+.ilbl { font-size:10px; letter-spacing:4px; color:var(--red2); text-transform:uppercase; margin-bottom:3px; display:block; }
+.ival { font-family:'Barlow'; font-weight:300; color:rgba(255,255,255,0.88); font-size:clamp(13px,1.2vw,15px); line-height:1.65; }
+.irow { margin-bottom:9px; }
+.pills { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+.pill { font-size:9px; letter-spacing:2px; text-transform:uppercase; border:1px solid rgba(184,150,46,0.3); color:rgba(184,150,46,0.85); padding:3px 10px; font-family:'Barlow Condensed'; }
+.fstrip { background:rgba(184,150,46,0.05); border-top:1px solid rgba(184,150,46,0.14); padding:12px 5vw; display:flex; gap:26px; flex-shrink:0; }
+.fstrip.fp { padding-left:13vw; }
+.fn { font-family:'Bebas Neue'; font-size:24px; color:var(--red2); line-height:1; }
+.fl { font-family:'Barlow Condensed'; font-size:9px; letter-spacing:2.5px; color:rgba(255,255,255,0.38); text-transform:uppercase; }
+
+/* ═══ SLIDE 6 — RESPONSIBILITIES ═══ */
+#s6 { background:var(--black); border-top:2px solid var(--red); justify-content:center; padding:0 7vw 32px 13vw; position:relative; overflow:hidden; }
+#s6::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(184,150,46,0.016) 40px,rgba(184,150,46,0.016) 41px); pointer-events:none; }
+.s6-bg { font-family:'Bebas Neue'; font-size:26vw; color:rgba(184,150,46,0.04); position:absolute; right:-4vw; top:50%; transform:translateY(-50%); pointer-events:none; animation:gPulse 9s ease-in-out infinite; }
+.s6-eye { font-size:10px; letter-spacing:6px; color:rgba(184,150,46,0.65); text-transform:uppercase; margin-bottom:12px; position:relative; z-index:2; display:block; }
+#s6 h2 { font-family:'Bebas Neue'; font-size:clamp(38px,6vw,84px); color:var(--red2); line-height:0.92; max-width:600px; letter-spacing:1px; margin-bottom:28px; position:relative; z-index:2; }
+.rlbl { font-family:'Bebas Neue'; font-size:10px; letter-spacing:5px; color:var(--red2); position:relative; z-index:2; margin-bottom:9px; display:block; }
+.rgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:13px; max-width:940px; position:relative; z-index:2; }
+/* RESPONSIBILITY CARD HOVER ANIMATIONS */
+.rcard {
+  background:rgba(6,6,6,0.72); border:1px solid rgba(184,150,46,0.14); padding:18px 15px;
+  position:relative; overflow:hidden;
+  transition:border-color 0.35s ease, transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+  cursor:default;
+}
+.rcard::after {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--red2); transform:scaleY(0); transform-origin:bottom;
+  transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);
+}
+.rcard:hover {
+  border-color:rgba(184,150,46,0.55);
+  transform:translateY(-7px) scale(1.02);
+  background:rgba(14,1,1,0.88);
+  box-shadow:0 22px 55px rgba(0,0,0,0.65), 0 0 35px rgba(184,150,46,0.13);
+}
+.rcard:hover::after { transform:scaleY(1); }
+.rcard:hover .rcnum { color:rgba(184,150,46,0.32); }
+.rcard:hover .rctitle { color:var(--red3); text-shadow:0 0 22px rgba(255,100,110,0.4); }
+.rcnum { font-family:'Bebas Neue'; font-size:36px; color:rgba(184,150,46,0.16); line-height:1; margin-bottom:4px; transition:color 0.3s; }
+.rctitle { font-family:'Barlow Condensed'; font-weight:600; color:var(--red2); font-size:15px; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; display:block; transition:color 0.3s, text-shadow 0.3s; }
+.rctext { font-family:'Barlow'; font-weight:300; font-size:clamp(12px,1.1vw,14px); color:rgba(255,255,255,0.82); line-height:1.6; }
+
+/* ═══ SLIDE 7 — TECHNOLOGY ═══ */
+#s7 { background:var(--black2); }
+.thdr { padding:20px 6vw 18px 13vw; border-bottom:1px solid rgba(184,150,46,0.12); display:flex; align-items:baseline; gap:18px; flex-shrink:0; }
+.thdr h2 { font-family:'Bebas Neue'; font-size:clamp(24px,4.2vw,60px); letter-spacing:2px; }
+.ttag { font-size:11px; letter-spacing:5px; color:var(--red2); text-transform:uppercase; }
+.tsplit { flex:1; display:grid; grid-template-columns:1fr 1fr; min-height:0; }
+.tpanel { padding:40px 5vw; position:relative; overflow:hidden; background:var(--black); }
+.tpanel:first-child { padding-left:13vw; border-right:1px solid rgba(184,150,46,0.06); }
+.tbgn { font-family:'Bebas Neue'; font-size:95px; color:rgba(184,150,46,0.03); line-height:0.8; position:absolute; top:14px; right:14px; letter-spacing:-5px; }
+.ticon { font-size:28px; margin-bottom:14px; display:block; }
+.tname { font-family:'Bebas Neue'; font-size:clamp(26px,3.2vw,44px); color:var(--red2); letter-spacing:1px; display:block; margin-bottom:4px; }
+.tsub { font-family:'Barlow Condensed'; font-weight:600; font-size:11px; letter-spacing:3px; color:rgba(184,150,46,0.5); text-transform:uppercase; margin-bottom:14px; display:block; }
+.tdesc { font-family:'Barlow'; font-weight:300; color:rgba(255,255,255,0.85); font-size:clamp(13px,1.2vw,15px); line-height:1.8; margin-bottom:14px; }
+.itag { display:inline-block; background:rgba(184,150,46,0.07); border:1px solid rgba(184,150,46,0.25); color:rgba(184,150,46,0.92); font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:3px 10px; font-family:'Barlow Condensed'; margin-right:5px; margin-bottom:5px; }
+
+/* ═══ SLIDE 8 — BIBLIOGRAPHY ═══ */
+#s8 { background:var(--black); padding:0 7vw 32px 13vw; justify-content:center; }
+.bib-eye { font-size:11px; letter-spacing:6px; color:var(--red2); text-transform:uppercase; margin-bottom:9px; display:block; }
+#s8 h2 { font-family:'Bebas Neue'; font-size:clamp(38px,5.5vw,72px); letter-spacing:2px; margin-bottom:7px; }
+.bib-hint { font-family:'Barlow Condensed'; font-size:11px; letter-spacing:2px; color:rgba(184,150,46,0.42); margin-bottom:22px; display:block; text-transform:uppercase; }
+.bib-list { display:flex; flex-direction:column; gap:8px; max-width:860px; }
+.bib-item { display:grid; grid-template-columns:26px 1fr; gap:10px; align-items:start; cursor:pointer; padding:10px 12px; margin:-10px -12px; border:1px solid transparent; transition:all 0.25s; }
+.bib-item:hover { background:rgba(184,150,46,0.05); border-color:rgba(184,150,46,0.22); }
+.bib-item:hover .bib-n { color:var(--red2); }
+.bib-n { font-family:'Bebas Neue'; color:rgba(184,150,46,0.55); font-size:17px; margin-top:2px; transition:color 0.25s; }
+.bib-t { font-family:'Barlow'; font-weight:300; font-size:clamp(12px,1.15vw,14px); color:rgba(255,255,255,0.75); line-height:1.6; border-bottom:1px solid rgba(184,150,46,0.07); padding-bottom:8px; }
+.bib-t strong { color:rgba(255,255,255,0.92); font-weight:400; }
+.bib-cta { font-size:10px; letter-spacing:2px; color:rgba(184,150,46,0.55); font-family:'Barlow Condensed'; margin-top:3px; display:block; text-transform:uppercase; }
+
+/* ═══ SLIDE 9 — OUTRO (FUTURISTIC) ═══ */
+#s9 { background:#0b0a06; justify-content:center; align-items:center; text-align:center; position:relative; overflow:hidden; }
+#s9::before { content:''; position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(212,175,55,0.025) 2px,rgba(212,175,55,0.025) 4px); animation:scanLine 10s linear infinite; }
+@keyframes scanLine { from{background-position:0 0} to{background-position:0 100px} }
+.otr-grid { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(212,175,55,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(212,175,55,0.07) 1px,transparent 1px); background-size:48px 48px; mask-image:radial-gradient(circle,black 35%,transparent 75%); }
+.radar { position:absolute; border-radius:50%; border:1px solid rgba(212,175,55,0.3); top:50%; left:50%; animation:radarPulse 4s ease-out infinite; }
+.radar:nth-child(2){animation-delay:1s}.radar:nth-child(3){animation-delay:2s}.radar:nth-child(4){animation-delay:3s}
+@keyframes radarPulse { 0%{width:0;height:0;transform:translate(-50%,-50%);opacity:1;border-color:rgba(212,175,55,0.8)} 100%{width:130vmax;height:130vmax;transform:translate(-50%,-50%);opacity:0;border-color:rgba(212,175,55,0)} }
+.oring { position:absolute; border-radius:50%; border:1px solid rgba(212,175,55,0.35); top:50%; left:50%; pointer-events:none; }
+.oring::after { content:''; position:absolute; width:10px; height:10px; background:var(--red2); border-radius:50%; top:-5px; left:50%; transform:translateX(-50%); box-shadow:0 0 20px 8px rgba(212,175,55,0.9), 0 0 40px 12px rgba(212,175,55,0.4); }
+.or1 { width:340px; height:340px; transform:translate(-50%,-50%); animation:rRot 18s linear infinite; }
+.or2 { width:540px; height:540px; transform:translate(-50%,-50%); animation:rRot 30s linear infinite reverse; border-color:rgba(212,175,55,0.2); }
+.or3 { width:740px; height:740px; transform:translate(-50%,-50%); animation:rRot 50s linear infinite; border-color:rgba(212,175,55,0.1); }
+.corner { position:absolute; width:56px; height:56px; border-color:rgba(212,175,55,0.6); border-style:solid; }
+.c-tl{top:28px;left:28px;border-width:2px 0 0 2px;box-shadow:-4px -4px 20px rgba(212,175,55,0.2)}
+.c-tr{top:28px;right:28px;border-width:2px 2px 0 0;box-shadow:4px -4px 20px rgba(212,175,55,0.2)}
+.c-bl{bottom:48px;left:28px;border-width:0 0 2px 2px;box-shadow:-4px 4px 20px rgba(212,175,55,0.2)}
+.c-br{bottom:48px;right:28px;border-width:0 2px 2px 0;box-shadow:4px 4px 20px rgba(212,175,55,0.2)}
+.otr-content { position:relative; z-index:10; }
+.wilson-logo { font-family:'Bebas Neue'; font-size:clamp(70px,12vw,150px); letter-spacing:12px; position:relative; display:inline-block; animation:glitch 6s 2s ease-in-out infinite; color:var(--white); text-shadow:0 0 60px rgba(212,175,55,0.3); }
+.wilson-logo span { color:var(--red2); text-shadow:0 0 40px rgba(212,175,55,0.8); }
+@keyframes glitch { 0%,88%,100%{transform:none;text-shadow:0 0 60px rgba(212,175,55,0.3)} 90%{transform:translateX(-3px);text-shadow:3px 0 rgba(212,175,55,0.9), 0 0 60px rgba(212,175,55,0.3)} 92%{transform:translateX(3px);text-shadow:-3px 0 rgba(50,50,200,0.5), 0 0 60px rgba(212,175,55,0.3)} 94%{transform:translateX(-1px);text-shadow:2px 0 rgba(212,175,55,0.7), 0 0 60px rgba(212,175,55,0.3)} 96%{transform:none} }
+.otr-tag { font-family:'Barlow Condensed'; font-weight:300; color:rgba(212,175,55,0.75); font-size:clamp(13px,1.4vw,18px); letter-spacing:8px; text-transform:uppercase; margin-top:16px; margin-bottom:44px; display:block; }
+.otr-div { width:1px; height:60px; background:linear-gradient(to bottom,var(--red2),transparent); margin:0 auto 28px; box-shadow:0 0 20px rgba(212,175,55,0.5); }
+.otr-credit { font-family:'Barlow'; font-weight:300; font-size:clamp(12px,1.1vw,15px); color:rgba(242,237,215,0.55); letter-spacing:3px; }
+.dnode { position:absolute; font-family:'Bebas Neue'; font-size:11px; letter-spacing:3px; color:rgba(212,175,55,0.7); border:1px solid rgba(212,175,55,0.35); padding:6px 14px; backdrop-filter:blur(4px); animation:nodeF 6s ease-in-out infinite; background:rgba(8,8,6,0.5); }
+.dn1{top:18%;left:8%;animation-delay:0s}
+.dn2{top:24%;right:9%;animation-delay:1s;animation-duration:7s}
+.dn3{bottom:22%;left:10%;animation-delay:2s;animation-duration:8s}
+.dn4{bottom:26%;right:8%;animation-delay:0.5s}
+@keyframes nodeF { 0%,100%{transform:translateY(0);opacity:0.7} 50%{transform:translateY(-12px);opacity:1} }
+</style>
+</head>
+<body>
+
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<button id="vo-btn" onclick="toggleVO()"><div class="vo-btn-dot"></div>PRESENTER NOTES</button>
+
+<div id="vo-modal">
+  <div id="vo-back" onclick="closeVO()"></div>
+  <div id="vo-panel">
+    <div class="vo-head">
+      <div><div class="vo-title">PRESENTER SCRIPT</div><div class="vo-sid" id="vo-sid">Slide 1</div></div>
+      <button id="vo-x" onclick="closeVO()">✕</button>
+    </div>
+    <div class="vo-prog"><div class="vo-prog-fill" id="vo-pf" style="width:11.1%"></div></div>
+    <div class="vo-body"><p class="vo-text" id="vo-text"></p></div>
+    <div class="vo-foot">
+      <button class="vo-nbtn" onclick="voNav(-1)">◀ PREV</button>
+      <button class="vo-nbtn" onclick="voNav(1)">NEXT ▶</button>
+    </div>
+  </div>
+</div>
+
+<div id="nav-hover-zone"></div>
+<div id="nav-arrow-hint">
+  <div class="nav-arrow-chevron nac1"></div>
+  <div class="nav-arrow-chevron nac2"></div>
+  <div class="nav-arrow-chevron nac3"></div>
+</div>
+<nav id="slide-nav">
+  <div id="nav-progress-bar"></div>
+  <!-- items injected by JS -->
+  <div class="sn-counter">
+    <div class="sn-counter-cur" id="sn-cur">1</div>
+    <div class="sn-counter-sep"></div>
+    <div class="sn-counter-tot" id="sn-tot">9</div>
+  </div>
+</nav>
+
+
+
+<div id="src-ov">
+  <div id="src-bk" onclick="closeSrc()"></div>
+  <div id="src-panel">
+    <div id="src-left">
+      <div class="src-bar">
+        <div class="src-dots">
+          <div class="sd sd-r" onclick="closeSrc()" title="Close"></div>
+          <div class="sd sd-y"></div>
+          <div class="sd sd-g"></div>
+        </div>
+        <span class="src-url" id="src-url-disp">—</span>
+      </div>
+      <div id="src-iframe-area"></div>
+    </div>
+    <div id="src-right">
+      <div class="src-rh">
+        <span class="src-rh-title">SOURCE DETAILS</span>
+        <button id="src-close" onclick="closeSrc()">✕</button>
+      </div>
+      <div class="src-rbody" id="src-rbody"></div>
+      <a class="src-obtn" id="src-obtn" href="#" target="_blank">↗ OPEN IN NEW TAB</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDES ═══════ -->
+
+<section class="slide" id="s1" data-nav="Title">
+  <div class="s1-grid"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+  <div class="ghost-w">W</div>
+  <div class="s1-inner">
+    <span class="s1-eye au">Industrial Design Presentation</span>
+    <h1 class="au d1">BILL<br><span>SEVERA</span></h1>
+    <div class="s1-ln alw d2"></div>
+    <p class="s1-sub au d3">Director of Advanced Innovation · Wilson Sporting Goods · 35+ Year Career</p>
+    <div class="s1-badge au d4">WILSON RACQUET SPORTS · 1984 – PRESENT</div>
+  </div>
+</section>
+
+<section class="slide" id="s2" data-nav="Biography">
+  <div class="s2-l">
+    <span class="bio-lbl au">01 · Designer Biography</span>
+    <div class="bio-name au d1">BILL<br>SEVERA</div>
+    <div class="bio-role au d2">Director of Advanced Innovation</div>
+    <div class="bio-stats au d3">
+      <div><span class="sn">35+</span><span class="sl">Years at Wilson</span></div>
+      <div><span class="sn">13</span><span class="sl">US Patents</span></div>
+      <div><span class="sn">#1</span><span class="sl">Selling Racquet</span></div>
+    </div>
+  </div>
+  <div class="s2-r">
+    <div class="sec-tag">BIOGRAPHY</div>
+    <p class="bio-body al">Bill Severa is Wilson's longest-serving engineer — over 35 years pushing the boundaries of racquet technology. Rising from senior designer to Director of Advanced Innovation, he leads Wilson LABS, the company's elite R&D division.</p>
+    <div class="bio-pts">
+      <div class="bio-pt au d2"><span class="bio-dot"></span><span>13 US patents including Sledgehammer, Power Holes and TRIAD technologies</span></div>
+      <div class="bio-pt au d3"><span class="bio-dot"></span><span>Lead architect of the Wilson Clash — the world's number one selling racquet</span></div>
+      <div class="bio-pt au d4"><span class="bio-dot"></span><span>Combines material science, biomechanics and sports psychology in every design</span></div>
+      <div class="bio-pt au d5"><span class="bio-dot"></span><span>Collaborates with elite athletes and recreational players alike</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s3" data-nav="Breakthrough">
+  <div class="s3-bg">B</div>
+  <span class="s3-eye au">Designer Breakthrough</span>
+  <h2 class="au d1">THE <span>PARADIGM</span><br>SHIFT</h2>
+  <span class="s3-sub au d2">How Severa Overturned 20 Years of Industry Dogma</span>
+  <div class="brk-grid">
+    <div>
+      <div class="brk-quote al d2">"Every engineer before me said flex was the enemy of control. I asked — what if we made flexibility itself the feature?"</div>
+      <p class="brk-desc au d3">For two decades, the tennis industry treated frame rigidity as gospel. Severa challenged this with a radical proposition: embed carbon fibres at unconventional angles to create a frame that flexes predictably. The result was the Wilson Clash and an industry-wide rethink of racquet design.</p>
+      <span class="brk-pills-lbl au d4">Breakthrough Impact</span>
+      <div class="brk-pills au d5">
+        <span class="brk-pill">FreeFlex Technology</span>
+        <span class="brk-pill">Reversed Industry Dogma</span>
+        <span class="brk-pill">World's Number 1 Racquet</span>
+        <span class="brk-pill">200+ Hours Player Research</span>
+        <span class="brk-pill">Sports Psychology Integration</span>
+      </div>
+    </div>
+    <div class="bk-stats">
+      <div class="bk-card ar d2"><span class="bk-num">#1</span><span class="bk-lbl">Global Racquet Sales</span><p class="bk-note">The Clash became the best-selling tennis racquet worldwide within its first year of launch in 2019.</p></div>
+      <div class="bk-card ar d3"><span class="bk-num">200+</span><span class="bk-lbl">Hours of Player Research</span><p class="bk-note">Severa spent over 200 hours with sports psychologists studying casual players — a first for Wilson's design process.</p></div>
+      <div class="bk-card ar d4"><span class="bk-num">20+</span><span class="bk-lbl">Years of Dogma Overturned</span><p class="bk-note">Industry rigidity standards had gone unchallenged for over two decades before the Clash redefined them.</p></div>
+      <div class="bk-card ar d5"><span class="bk-num">13</span><span class="bk-lbl">US Patents Filed</span><p class="bk-note">Each represents a novel engineering problem Severa solved that no one else had tackled.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s4" data-nav="Clash">
+  <div class="shdr red">
+    <h2>Design Example 01 — Wilson Clash</h2>
+    <span class="stag">Launched 2019</span>
+  </div>
+  <div class="dsplit dlv" style="flex:1;min-height:0;">
+    <div class="rp rp1">
+      <div class="svgph as"><span>CLASH SVG</span><small>Paste your &lt;svg&gt; here</small></div>
+    </div>
+    <div class="dinfo">
+      <div class="dnum cr au">01</div>
+      <div class="dtitle au d1">WILSON<br>CLASH</div>
+      <div class="irow au d2"><span class="ilbl">Description</span><span class="ival">Revolutionary racquet combining extreme flexibility with stability — carbon fibres layered at unconventional angles. Features FreeFlex and StableSmart technologies.</span></div>
+      <div class="irow au d3"><span class="ilbl">Target Market</span><span class="ival">Recreational and intermediate players seeking confidence and power. Ages 16 to 45.</span></div>
+      <div class="irow au d4"><span class="ilbl">Preferred Futures and Ethical Design</span><span class="ival">200+ hours with sports psychologists to understand player psychology. Democratises high-performance tennis for everyday players.</span></div>
+      <div class="pills au d5"><span class="pill">FreeFlex</span><span class="pill">StableSmart</span><span class="pill">Carbon Fibre</span><span class="pill">Player-Centred</span></div>
+    </div>
+  </div>
+  <div class="fstrip">
+    <div><div class="fn">#1</div><div class="fl">Global Racquet</div></div>
+    <div><div class="fn">2019</div><div class="fl">Launch Year</div></div>
+    <div><div class="fn">5°</div><div class="fl">Unconventional Fibre Angle</div></div>
+    <div><div class="fn">3</div><div class="fl">Frame Zones</div></div>
+  </div>
+</section>
+
+<section class="slide" id="s5" data-nav="Pro Staff">
+  <div class="shdr dark">
+    <h2>Design Example 02 — Wilson Pro Staff</h2>
+    <span class="stag">Series: 1983 – Present</span>
+  </div>
+  <div class="dsplit drv" style="flex:1;min-height:0;">
+    <div class="dinfo lp">
+      <div class="dnum cg au">02</div>
+      <div class="dtitle au d1">WILSON<br>PRO STAFF</div>
+      <div class="irow au d2"><span class="ilbl">Description</span><span class="ival">Wilson's most iconic franchise — double-braided graphite and Kevlar fibres for unmatched feel and precision. 117+ Grand Slam titles won.</span></div>
+      <div class="irow au d3"><span class="ilbl">Target Market</span><span class="ival">Advanced and professional players prioritising feel and precision. Federer, Sampras, Graf and Evert.</span></div>
+      <div class="irow au d4"><span class="ilbl">Preferred Futures and Ethical Design</span><span class="ival">Co-iterated with Federer over two years — sometimes adjusting a single gram of handle weight. The v14 honours 1983 heritage with next-generation materials.</span></div>
+      <div class="pills au d5"><span class="pill">Graphite/Kevlar</span><span class="pill">Braid 45°</span><span class="pill">Paradigm Bending</span><span class="pill">Athlete Co-Design</span></div>
+    </div>
+    <div class="rp rp2">
+      <div class="ps-ghost">PS</div>
+      <div style="z-index:2;text-align:center;">
+        <div class="svgph as"><span>PRO STAFF SVG</span><small>Paste your &lt;svg&gt; here</small></div>
+        <span class="ps-since">SINCE 1983 · 117 GRAND SLAMS</span>
+      </div>
+    </div>
+  </div>
+  <div class="fstrip fp">
+    <div><div class="fn">117+</div><div class="fl">Grand Slam Titles Won</div></div>
+    <div><div class="fn">1983</div><div class="fl">Original Series Launch</div></div>
+    <div><div class="fn">v14</div><div class="fl">Current Iteration</div></div>
+    <div><div class="fn">2yr</div><div class="fl">Federer Co-Development</div></div>
+  </div>
+</section>
+
+<section class="slide" id="s6" data-nav="Roles">
+  <div class="s6-bg">R</div>
+  <span class="s6-eye au">03 · Designer Responsibilities and Influencing Factors</span>
+  <h2 class="au d1">HOW RESPONSIBILITIES<br>SHAPE SOLUTIONS</h2>
+  <span class="rlbl au d2">RESPONSIBILITIES</span>
+  <div class="rgrid" style="margin-bottom:20px;">
+    <div class="rcard au d2"><div class="rcnum">01</div><span class="rctitle">Professional</span><p class="rctext">Co-designing with elite athletes including Federer across two years — ensuring racquets perform under real match conditions at the highest level.</p></div>
+    <div class="rcard au d3"><div class="rcnum">02</div><span class="rctitle">Material</span><p class="rctext">Selecting and testing advanced materials — Kevlar, graphite, carbon fibre — balancing durability, weight and performance across all skill levels.</p></div>
+    <div class="rcard au d4"><div class="rcnum">03</div><span class="rctitle">User</span><p class="rctext">Spent 200+ hours with sports psychologists studying casual players — shifting Wilson's entire design philosophy to prioritise confidence over specs alone.</p></div>
+  </div>
+  <span class="rlbl au d3">INFLUENCING FACTORS</span>
+  <div class="rgrid">
+    <div class="rcard au d3"><div class="rcnum">04</div><span class="rctitle">Commercial</span><p class="rctext">As Wilson lost market share in the early 2000s, Severa balanced innovation with viability — leading to the Clash becoming the world's number one selling racquet.</p></div>
+    <div class="rcard au d4"><div class="rcnum">05</div><span class="rctitle">Legal and IP</span><p class="rctext">13 patents protect Wilson's competitive edge while pushing limits within industry regulations on permissible racquet dimensions and materials.</p></div>
+    <div class="rcard au d5"><div class="rcnum">06</div><span class="rctitle">Brand Legacy</span><p class="rctext">Every design weighs Wilson's 110-year legacy against modern demands — seen in the Pro Staff v14's nod to 1983 aesthetics with next-generation materials.</p></div>
+  </div>
+</section>
+
+<section class="slide" id="s7" data-nav="Tech">
+  <div class="thdr">
+    <h2>04 · Technology and Quality of Life</h2>
+    <span class="ttag">Two Innovations · Societal and Environmental Impact</span>
+  </div>
+  <div class="tsplit">
+    <div class="tpanel">
+      <span class="tbgn">01</span>
+      <span class="ticon as">🧬</span>
+      <span class="tname au d1">Carbon Fibre Composites</span>
+      <span class="tsub au d2">Past and Current Technology</span>
+      <p class="tdesc au d3">Severa championed the shift from wood and steel to graphite and Kevlar composites in the 1980s and 90s. Racquets became lighter, stronger and more responsive — transforming tennis from an elite sport into one accessible to millions worldwide.</p>
+      <p class="tdesc au d4"><strong style="color:rgba(255,255,255,0.82)">Societal Impact:</strong> Lower-weight frames reduced injury rates and made the sport accessible to older players, children and those with physical limitations — growing global participation dramatically.</p>
+      <span class="itag au d5">Reduced Injuries</span><span class="itag au d5">Mass Accessibility</span><span class="itag au d5">Sport Growth</span>
+    </div>
+    <div class="tpanel">
+      <span class="tbgn">02</span>
+      <span class="ticon as">⚗️</span>
+      <span class="tname au d1">Nanotechnology in Sport</span>
+      <span class="tsub au d2">Emerging Technology</span>
+      <p class="tdesc au d3">Wilson's nCode series (2004) embedded nano-sized silicone oxide crystals into the carbon fibre frame — increasing density at the molecular level. Superior strength, stability and resilience previously impossible to manufacture.</p>
+      <p class="tdesc au d4"><strong style="color:rgba(255,255,255,0.82)">Environmental Impact:</strong> Nano-enhanced frames last significantly longer, reducing racquet replacement frequency and lowering manufacturing waste — a step toward sustainable sporting goods.</p>
+      <span class="itag au d5">Frame Longevity</span><span class="itag au d5">Less Waste</span><span class="itag au d5">Performance Ceiling Raised</span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s8" data-nav="References">
+  <span class="bib-eye au">05 · APA Bibliography</span>
+  <h2 class="au d1">REFERENCES</h2>
+  <span class="bib-hint au d2">Click any source to preview</span>
+  <div class="bib-list">
+    <div class="bib-item" onclick="openSrc(0)"><span class="bib-n">1.</span><span class="bib-t"><strong>Wilson Sporting Goods.</strong> (2019). <em>Wilson LABS: Clash Racket.</em> wilson.com<span class="bib-cta">↗ Click to preview</span></span></div>
+    <div class="bib-item" onclick="openSrc(1)"><span class="bib-n">2.</span><span class="bib-t"><strong>Wilson Sporting Goods.</strong> (2023). <em>Wilson Pro Staff: A History.</em> wilson.com<span class="bib-cta">↗ Click to preview</span></span></div>
+    <div class="bib-item" onclick="openSrc(2)"><span class="bib-n">3.</span><span class="bib-t"><strong>Wilson Sporting Goods.</strong> (2024). <em>The Making of Roger Federer's New Tennis Racket.</em> wilson.com<span class="bib-cta">↗ Click to preview</span></span></div>
+    <div class="bib-item" onclick="openSrc(3)"><span class="bib-n">4.</span><span class="bib-t"><strong>Tennis Industry Magazine.</strong> (2004). <em>Industry News: Bill Severa appointed Director of Technology.</em> tennisindustrymag.com<span class="bib-cta">↗ Click to preview</span></span></div>
+    <div class="bib-item" onclick="openSrc(4)"><span class="bib-n">5.</span><span class="bib-t"><strong>Sports Illustrated.</strong> (2015). <em>The history of rackets and why players experiment with head size, materials.</em> si.com<span class="bib-cta">↗ Click to preview</span></span></div>
+    <div class="bib-item" onclick="openSrc(5)"><span class="bib-n">6.</span><span class="bib-t"><strong>Merchant of Tennis.</strong> (2024). <em>A Brand History: Wilson.</em> merchantoftennis.com<span class="bib-cta">↗ Click to preview</span></span></div>
+    <div class="bib-item" onclick="openSrc(6)"><span class="bib-n">7.</span><span class="bib-t"><strong>Thrive Thinking.</strong> (2024). <em>Case Study on Actionable Insight for Wilson Tennis Rackets.</em> thrivethinking.com<span class="bib-cta">↗ Click to preview</span></span></div>
+    <div class="bib-item" onclick="openSrc(7)"><span class="bib-n">8.</span><span class="bib-t"><strong>Wikipedia.</strong> (2026). <em>Wilson Sporting Goods.</em> Wikimedia Foundation.<span class="bib-cta">↗ Click to preview</span></span></div>
+  </div>
+</section>
+
+<section class="slide" id="s9" data-nav="Outro">
+  <div class="radar"></div><div class="radar"></div><div class="radar"></div><div class="radar"></div>
+  <div class="otr-grid"></div>
+  <div class="oring or1"></div><div class="oring or2"></div><div class="oring or3"></div>
+  <div class="corner c-tl"></div><div class="corner c-tr"></div>
+  <div class="corner c-bl"></div><div class="corner c-br"></div>
+  <div class="dnode dn1">WILSON LABS</div>
+  <div class="dnode dn2">35+ YEARS</div>
+  <div class="dnode dn3">13 PATENTS</div>
+  <div class="dnode dn4">117 GRAND SLAMS</div>
+  <div class="otr-content">
+    <div class="wilson-logo au">WILSON<span>.</span></div>
+    <span class="otr-tag au d1">Engineering the Future of Tennis · Since 1914</span>
+    <div class="otr-div ai d2"></div>
+    <div class="otr-credit au d3">Presentation by Arjun Hatle · Industrial Design Study · 2026</div>
+  </div>
+</section>
+
+<script>
+/* ═══ DATA ═══ */
+const sources = [
+  {num:1,author:"Wilson Sporting Goods",year:"2019",title:"Wilson LABS: Clash Racket",url:"https://www.wilson.com/en-us/blog/tennis/wilson-labs/wilson-labs-clash-racket",type:"Corporate Blog / R&D Documentation",relevance:"Primary source documenting the Clash's design philosophy, FreeFlex and StableSmart technologies, and Severa's role as lead designer.",domain:"wilson.com"},
+  {num:2,author:"Wilson Sporting Goods",year:"2023",title:"Wilson Pro Staff: A History",url:"https://www.wilson.com/en-us/blog/tennis/wilson-labs/wilson-pro-staff-history",type:"Corporate Blog",relevance:"Documents the Pro Staff lineage from 1983 to present, detailing Severa's involvement across multiple generations and athlete collaborations.",domain:"wilson.com"},
+  {num:3,author:"Wilson Sporting Goods",year:"2024",title:"The Making of Roger Federer's New Tennis Racket",url:"https://www.wilson.com/en-us/blog/tennis/team/roger-federer-new-tennis-racket-journey-innovation-and-legacy",type:"Corporate Blog / Case Study",relevance:"Details the two-year co-development process between Severa's team and Roger Federer for the Pro Staff v14, including granular design adjustments.",domain:"wilson.com"},
+  {num:4,author:"Tennis Industry Magazine",year:"2004",title:"Industry News: Bill Severa appointed Director of Technology",url:"https://www.tennisindustrymag.com/articles/2004/04/industry_news_29.html",type:"Trade Publication",relevance:"Contemporary trade press coverage confirming Severa's promotion and early career milestones. Independent third-party verification.",domain:"tennisindustrymag.com"},
+  {num:5,author:"Sports Illustrated",year:"2015",title:"The history of rackets and why players experiment with head size, materials",url:"https://www.si.com/tennis/2015/12/03/history-of-rackets-roger-federer",type:"Sports Journalism",relevance:"Provides historical context for material science evolution in racquet design — situating Severa's work within broader industry shifts.",domain:"si.com"},
+  {num:6,author:"Merchant of Tennis",year:"2024",title:"A Brand History: Wilson",url:"https://www.merchantoftennis.com/blogs/tennis-interest/a-brand-history-wilson",type:"Industry Retailer Publication",relevance:"Independent retail perspective on Wilson's brand trajectory and product milestones — useful for understanding commercial context.",domain:"merchantoftennis.com"},
+  {num:7,author:"Thrive Thinking",year:"2024",title:"Case Study on Actionable Insight for Wilson Tennis Rackets",url:"https://thrivethinking.com/case-studies/wilson-clash-racket-actionable-insight/",type:"Design Research / Case Study",relevance:"External design consultancy analysis of the Clash's user research methodology — supports the 200+ hours player research claim.",domain:"thrivethinking.com"},
+  {num:8,author:"Wikipedia / Wikimedia Foundation",year:"2026",title:"Wilson Sporting Goods",url:"https://en.wikipedia.org/wiki/Wilson_Sporting_Goods",type:"Encyclopedic Reference",relevance:"Background reference for Wilson's founding (1914), company history, and general corporate information. Used for contextual framing only.",domain:"en.wikipedia.org"}
+];
+
+const voScripts = [
+  {slide:"Slide 1 — Title",text:"This presentation is about Bill Severa — Wilson's Director of Advanced Innovation and the engineer behind some of the most significant racquet designs in tennis history. He's spent over 35 years at a single company, which in itself tells you something about the depth of his contribution. Let me take you through who he is, what he built, and why it matters."},
+  {slide:"Slide 2 — Biography",text:"Severa joined Wilson in 1984 — the era of wood-to-graphite transition. Rather than following that shift, he led it. He rose from senior designer to running Wilson LABS, the company's elite R&D division. His career spans 13 US patents, the world's number one selling racquet, and collaborations with players from Federer to club-level amateurs. That range is deliberate — and it defines everything about his approach."},
+  {slide:"Slide 3 — The Paradigm Shift",text:"This is the central idea of Severa's career. For over twenty years, the industry treated frame stiffness as non-negotiable — flex meant lost control. Severa inverted the question entirely: what if controlled flex was a feature, not a flaw? He spent 200 hours with sports psychologists studying recreational players, embedded carbon fibres at unconventional angles, and produced the Clash. The industry had to rethink two decades of design doctrine."},
+  {slide:"Slide 4 — Wilson Clash",text:"The Clash is where that breakthrough became a product. It combines FreeFlex technology — which allows the frame to bend through the swing — with the StableSmart framework that keeps the face stable on impact. Carbon fibres are layered at angles nobody had tried commercially. It launched in 2019 and immediately became the world's number one selling racquet. The target was intermediate players who felt underserved by traditional stiff frames — and they responded immediately."},
+  {slide:"Slide 5 — Pro Staff",text:"The Pro Staff is the other side of Severa's portfolio — precision over accessibility. It's won 117 Grand Slam titles. Severa co-developed the v14 with Roger Federer over two years, iterating on handle weight sometimes by a single gram. Double-braided graphite and Kevlar fibres give it a feel that elite players describe as an extension of the arm. Where the Clash democratised tennis, the Pro Staff pushed the ceiling of what's technically possible."},
+  {slide:"Slide 6 — Responsibilities",text:"What makes Severa's position complex is the breadth of pressures he manages at once. He's accountable to professional athletes, to material scientists, to IP lawyers, and to brand strategists — all simultaneously. The six factors on this slide show how those responsibilities interact. His 200-hour player psychology study, for instance, was a direct response to commercial pressure as Wilson lost market share. The best design outcomes here come from holding all six in tension — not optimising for just one."},
+  {slide:"Slide 7 — Technology",text:"Severa's career maps neatly onto two material eras. In the 1980s and 90s, he championed carbon fibre composites — lighter, stronger, more accessible. That shift grew global tennis participation dramatically by reducing injury rates and making the sport viable for people who couldn't handle heavier frames. The second era is nanotechnology — Wilson's nCode series embeds silicone oxide crystals at the molecular level, extending frame life and cutting manufacturing waste. Both technologies have effects well beyond sport."},
+  {slide:"Slide 8 — References",text:"These eight sources cover Wilson's own R&D documentation, independent trade journalism, sports science reporting, and encyclopedic background. I've deliberately drawn from multiple independent channels — which means Severa's impact isn't self-reported. The Tennis Industry Magazine piece from 2004 is particularly useful as a contemporary, third-party confirmation of his career trajectory. Click any source to see the full article preview."},
+  {slide:"Slide 9 — Closing",text:"To close: Bill Severa will likely never be a household name. But the racquets he designed have been in the hands of millions — from club players building confidence with the Clash, to Federer winning Grand Slams with the Pro Staff. That's the measure of great industrial design — it lives in objects, not in attribution. Severa is proof that the most impactful designers are often the ones you've never heard of."}
+];
+
+/* ═══ DUAL CURSOR ═══ */
+const curDot  = document.getElementById('cur-dot');
+const curRing = document.getElementById('cur-ring');
+let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function animCursor(){
+  curDot.style.left  = mx+'px';
+  curDot.style.top   = my+'px';
+  rx += (mx-rx)*0.09;
+  ry += (my-ry)*0.09;
+  curRing.style.left = rx+'px';
+  curRing.style.top  = ry+'px';
+  requestAnimationFrame(animCursor);
+})();
+
+/* ═══ BUILD CINEMATIC NAV ═══ */
+const slides = Array.from(document.querySelectorAll('.slide'));
+const snNav  = document.getElementById('slide-nav');
+const snProg = document.getElementById('nav-progress-bar');
+const snCur  = document.getElementById('sn-cur');
+const snTot  = document.getElementById('sn-tot');
+
+snTot.textContent = slides.length;
+
+const snItems = slides.map((slide, i) => {
+  const label = slide.dataset.nav || `Slide ${i+1}`;
+  const item  = document.createElement('button');
+  item.className = 'sn-item' + (i === 0 ? ' active' : '');
+  item.setAttribute('aria-label', label);
+  item.innerHTML = `
+    <span class="sn-num">0${i+1}</span>
+    <div class="sn-pip-row"><div class="sn-pip"></div></div>
+    <span class="sn-label">${label}</span>
+  `;
+  item.addEventListener('click', () => {
+    slide.scrollIntoView({ behavior:'smooth' });
+    currentVO = i;
+    if (voOpen) renderVO();
+  });
+  // insert before counter
+  snNav.insertBefore(item, snNav.querySelector('.sn-counter'));
+  return item;
+});
+
+function updateNav(){
+  const wh = innerHeight; let active = 0;
+  slides.forEach((s,i) => { if(s.getBoundingClientRect().top <= wh * 0.5) active = i; });
+  snItems.forEach((item, i) => item.classList.toggle('active', i === active));
+  snCur.textContent = active + 1;
+  const pct = slides.length > 1 ? (active / (slides.length - 1)) * 100 : 0;
+  snProg.style.width = pct + '%';
+  if(voOpen && currentVO !== active){ currentVO = active; renderVO(); }
+}
+
+
+
+/* ═══ VOICEOVER ═══ */
+let currentVO=0,voOpen=false;
+function renderVO(){const s=voScripts[currentVO];document.getElementById('vo-text').textContent=s.text;document.getElementById('vo-sid').textContent=s.slide;document.getElementById('vo-pf').style.width=((currentVO+1)/voScripts.length*100)+'%';}
+function toggleVO(){voOpen?closeVO():openVO();}
+function openVO(){voOpen=true;renderVO();document.getElementById('vo-modal').classList.add('open');document.getElementById('vo-btn').classList.add('playing');}
+function closeVO(){voOpen=false;document.getElementById('vo-modal').classList.remove('open');document.getElementById('vo-btn').classList.remove('playing');}
+function voNav(dir){currentVO=Math.max(0,Math.min(voScripts.length-1,currentVO+dir));renderVO();const idx=Math.min(currentVO,slides.length-1);slides[idx].scrollIntoView({behavior:'smooth'});}
+
+/* ═══ SOURCE PREVIEW ═══ */
+function openSrc(idx){
+  const s=sources[idx];
+  document.getElementById('src-url-disp').textContent=s.url;
+  document.getElementById('src-obtn').href=s.url;
+  document.getElementById('src-rbody').innerHTML=`
+    <div><span class="src-fl-lbl">Author</span><span class="src-fl-val">${s.author}</span></div>
+    <div class="src-div"></div>
+    <div><span class="src-fl-lbl">Year</span><span class="src-fl-val">${s.year}</span></div>
+    <div class="src-div"></div>
+    <div><span class="src-fl-lbl">Title</span><span class="src-fl-val">${s.title}</span></div>
+    <div class="src-div"></div>
+    <div><span class="src-fl-lbl">Source Type</span><span class="src-fl-val">${s.type}</span></div>
+    <div class="src-div"></div>
+    <div><span class="src-fl-lbl">Relevance</span><span class="src-fl-val">${s.relevance}</span></div>
+    <div class="src-div"></div>
+    <div><span class="src-fl-lbl">URL</span><span class="src-fl-val" style="word-break:break-all;font-size:11px;color:rgba(184,150,46,0.75)">${s.url}</span></div>
+  `;
+
+  const area=document.getElementById('src-iframe-area');
+  area.innerHTML='';
+  area.style.cssText='flex:1;display:flex;flex-direction:column;';
+
+  const iframe=document.createElement('iframe');
+  iframe.style.cssText='flex:1;border:none;width:100%;';
+  iframe.src=s.url;
+  iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-forms');
+
+  const fallback=document.createElement('div');
+  fallback.className='src-noprev';
+  fallback.style.display='none';
+  fallback.innerHTML=`<div class="lock">🔒</div><p>${s.domain}</p><small>Site blocks embedded preview</small><a class="np-btn" href="${s.url}" target="_blank">↗ Open directly in browser</a>`;
+
+  // Detect if iframe is blocked after load
+  const timer=setTimeout(()=>{
+    try {
+      const doc=iframe.contentDocument||iframe.contentWindow.document;
+      if(!doc||doc.body.innerHTML.trim()===''){iframe.style.display='none';fallback.style.display='flex';}
+    } catch(e){ /* cross-origin: iframe loaded fine, leave it */ }
+  },3500);
+
+  iframe.onerror=()=>{clearTimeout(timer);iframe.style.display='none';fallback.style.display='flex';};
+  area.appendChild(iframe);
+  area.appendChild(fallback);
+
+  document.getElementById('src-ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSrc(){
+  document.getElementById('src-ov').classList.remove('open');
+  document.body.style.overflow='';
+  setTimeout(()=>{document.getElementById('src-iframe-area').innerHTML='';},350);
+}
+
+/* ═══ NAV SHOW/HIDE ON HOVER ═══ */
+const navEl    = document.getElementById('slide-nav');
+const hoverZone= document.getElementById('nav-hover-zone');
+const arrowHint= document.getElementById('nav-arrow-hint');
+let navHideTimer;
+
+function showNav() {
+  clearTimeout(navHideTimer);
+  navEl.classList.add('nav-visible');
+  arrowHint.classList.add('hidden');
+}
+function hideNav() {
+  navHideTimer = setTimeout(() => {
+    navEl.classList.remove('nav-visible');
+    arrowHint.classList.remove('hidden');
+  }, 600);
+}
+
+hoverZone.addEventListener('mouseenter', showNav);
+hoverZone.addEventListener('mouseleave', hideNav);
+navEl.addEventListener('mouseenter', showNav);
+navEl.addEventListener('mouseleave', hideNav);
+
+/* ═══ SLIDE TRACKING — IntersectionObserver for bulletproof active state ═══ */
+let activeSlideIdx = 0;
+
+const slideTracker = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = slides.indexOf(entry.target);
+      if (idx !== -1) {
+        activeSlideIdx = idx;
+        snItems.forEach((item, i) => item.classList.toggle('active', i === idx));
+        snCur.textContent = idx + 1;
+        const pct = slides.length > 1 ? (idx / (slides.length - 1)) * 100 : 0;
+        snProg.style.width = pct + '%';
+        if (voOpen && currentVO !== idx) { currentVO = idx; renderVO(); }
+      }
+    }
+  });
+}, { threshold: 0.55 });
+
+slides.forEach(slide => slideTracker.observe(slide));
+
+// Fallback scroll listener for edge cases
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
+
+/* ═══ ENTRY ANIMATIONS — trigger only when slide enters view ═══ */
+const animClasses = ['au','ai','al','ar','as','alw'];
+const observed = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const els = entry.target.querySelectorAll(animClasses.map(c=>'.'+c).join(','));
+    if (entry.isIntersecting) {
+      // Reset and replay
+      els.forEach(el => {
+        el.style.animation = 'none';
+        el.offsetHeight; // reflow
+        el.style.animation = '';
+      });
+    } else {
+      // Reset opacity so elements are hidden until next entry
+      els.forEach(el => {
+        el.style.animation = 'none';
+        el.style.opacity = '0';
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+slides.forEach(slide => observed.observe(slide));
+</script>
+</body>
+</html>
